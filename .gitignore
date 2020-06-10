@@ -1,6 +1,3 @@
-data/recoils/AtmNu_Recoils_Xe.txt
-data/recoils/AtmNu_Recoils_Ar.txt
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
