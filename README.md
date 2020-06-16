@@ -24,7 +24,9 @@ contact: ciaran.aj.ohare@gmail.com
 # Examples:
 Click to go to the notebook used to make the plot
 
-[<img src="plots/plots_png/Bfield_sensitivity.png" width="1000">](https://github.com/cajohare/AxionLimits/blob/master/Plot_Bfield.ipynb)
+[<img src="plots/plots_png/AxionPhoton.png" width="1000">](https://github.com/cajohare/AxionLimits/blob/master/AxionPhoton_Constraint_Plot.ipynb)
+
+[<img src="plots/plots_png/AxionPhotn.png" width="1000">](https://github.com/cajohare/AxionLimits/blob/master/Plot_Bfield.ipynb)
 
 [<img src="plots/plots_png/IAXO_Sensitivity_Asimov.png" width="1000">](https://github.com/cajohare/AxionLimits/blob/master/Test_IAXO_SensitivityAsimov.ipynb)
 
