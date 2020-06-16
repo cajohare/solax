@@ -6,7 +6,7 @@
 # solax
 Python-3 Code to reproduce the results from our paper arXiv:[2006.XXXXX] "Axion helioscopes as solar magnetometers"
 
-If all you need is the data for the longitudinal plasmon flux for our benchmark seismic solar magnetic field model then [click here](https://github.com/cajohare/AxionLimits/raw/master/data/solar/LPlasmonFlux_SeismicB.txt). If you want the refined Primakoff flux data then [click here](https://github.com/cajohare/AxionLimits/raw/master/data/solar/rimakoffFlux_PlasmonCorrected.txt)
+If all you need is the data for the longitudinal plasmon flux for our benchmark seismic solar magnetic field model then [click here](https://github.com/cajohare/solax/raw/master/data/solar/LPlasmonFlux_SeismicB.txt). If you want the refined Primakoff flux data then [click here](https://github.com/cajohare/solax/raw/master/data/solar/PrimakoffFlux_PlasmonCorrected.txt)
 
 If you need any assistance or have any questions contact me at ciaran.aj.ohare@gmail.com
 
