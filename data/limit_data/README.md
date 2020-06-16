@@ -2,6 +2,5 @@
 
 ## Currently includes:
 * AxionPhoton (g_ap) 
-* AxionElectron (g_ae)
 
 ---

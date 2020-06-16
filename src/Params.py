@@ -1,14 +1,12 @@
-from __future__ import print_function
 from numpy import array, sqrt, pi, exp, interp, loadtxt, zeros, shape, ones
 from numpy import logspace, linspace, log10
 from scipy.special import erf
 
-
+# Directory structure:
 data_dir = '../data/'
 limit_dir = '../data/limit_data/'
 pltdir = '../plots/'
 pltdir_png = pltdir+'plots_png/'
-
 
 # Constants
 m_p = 0.9315*1e6

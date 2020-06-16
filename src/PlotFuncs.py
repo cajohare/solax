@@ -26,13 +26,17 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from scipy.stats import norm
 from Params import *
 
+#==============================================================================#
+# My custom figure save
 def MySaveFig(fig,pltname,pngsave=True):
     fig.savefig(pltdir+pltname+'.pdf',bbox_inches='tight')
     if pngsave:
         fig.savefig(pltdir_png+pltname+'.png',bbox_inches='tight')
+#==============================================================================#
 
 
-
+#==============================================================================#
+# My preferred style of colorbar
 def cbar(mappable,extend='neither',\
                 label='',lfs=35,labelpad=40,labelrotation=-90):
     ax = mappable.axes
@@ -44,13 +48,9 @@ def cbar(mappable,extend='neither',\
     cbar.ax.tick_params(which='major',length=10,width=3)
     cbar.set_label(label,fontsize=lfs,rotation=labelrotation,labelpad=labelpad)
     return cbar
-
 #==============================================================================#
-from copy import copy
-def cmap_setunderwhite(cmap):
-    cmap_c = copy(plt.get_cmap(cmap))
-    cmap_c.set_under('white', 1.0)
-    return cmap_c
+
+
 
 #==============================================================================#
 def MySquarePlot(xlab='',ylab='',\
@@ -132,9 +132,6 @@ def MyDoublePlot_Vertical(xlab1='',ylab1='',xlab2='',ylab2='',\
         ax1.grid()
         ax2.grid()
     return fig,ax1,ax2
-#==============================================================================#
-
-
 
 def MyTriplePlot(xlab1='',ylab1='',xlab2='',ylab2='',xlab3='',ylab3='',\
                  wspace=0.25,lw=2.5,lfs=45,tfs=25,size_x=20,size_y=7,Grid=False):
@@ -174,7 +171,6 @@ def MyTriplePlot(xlab1='',ylab1='',xlab2='',ylab2='',xlab3='',ylab3='',\
         ax2.grid()
         ax3.grid()
     return fig,ax1,ax2,ax3
-#==============================================================================#
 
 def MyTriplePlot_Vertical(xlab1='',ylab1='',xlab2='',ylab2='',xlab3='',ylab3='',\
                  hspace=0.25,lw=2.5,lfs=45,tfs=35,size_x=20,size_y=15,Grid=False):
@@ -218,7 +214,19 @@ def MyTriplePlot_Vertical(xlab1='',ylab1='',xlab2='',ylab2='',xlab3='',ylab3='',
 
 
 
+
+
+
+
 #==============================================================================#
+# Colormap stuff:
+
+from copy import copy
+def cmap_setunderwhite(cmap):
+    cmap_c = copy(plt.get_cmap(cmap))
+    cmap_c.set_under('white', 1.0)
+    return cmap_c
+
 def reverse_colourmap(cmap, name = 'my_cmap_r'):
     reverse = []
     k = []
@@ -235,10 +243,8 @@ def reverse_colourmap(cmap, name = 'my_cmap_r'):
     LinearL = dict(zip(k,reverse))
     my_cmap_r = mpl.colors.LinearSegmentedColormap(name, LinearL)
     return my_cmap_r
-#==============================================================================#
 
 
-#==============================================================================#
 def col_alpha(col,alpha=0.1):
     rgb = colors.colorConverter.to_rgb(col)
     bg_rgb = [1,1,1]
@@ -247,10 +253,13 @@ def col_alpha(col,alpha=0.1):
 #==============================================================================#
 
 
-
-def AxionPlotSetup(CAST_text_on=True,Haloscopes_text_on=True,QCD_text_on=True,StellarBounds_text_on=True):
-    fig,ax = AxionPhoton.FigSetup(Shape='Square',ylab='$|g_{a\gamma}|$ [GeV$^{-1}$]',mathpazo=True,\
-                                  g_min=1e-12,g_max=1e-9,m_min=1e-6,m_max=1e0,tfs=35)
+#==============================================================================#
+# Set up axion plot as desired:
+def AxionPlotSetup(CAST_text_on=True,Haloscopes_text_on=True,QCD_text_on=True,\
+                        StellarBounds_text_on=True):
+    fig,ax = AxionPhoton.FigSetup(Shape='Square',\
+                    ylab='$|g_{a\gamma}|$ [GeV$^{-1}$]',mathpazo=True,\
+                    g_min=1e-12,g_max=1e-9,m_min=1e-6,m_max=1e0,tfs=35)
 
     AxionPhoton.QCDAxion(ax,text_on=False,thick_lines=True)
     AxionPhoton.StellarBounds(ax,text_on=False)
@@ -258,11 +267,14 @@ def AxionPlotSetup(CAST_text_on=True,Haloscopes_text_on=True,QCD_text_on=True,St
 
     m_min=1e-6
     m_max=1e0
-    plt.plot([m_min,m_max],[2e-10*0.1*m_min,2e-10*0.1*m_max],'-',color='brown',lw=1.5,zorder=0,alpha=0.1)
-    plt.plot([m_min,m_max],[2e-10*10*m_min,2e-10*10*m_max],'-',color='brown',lw=1.5,zorder=0,alpha=0.1)
+    plt.plot([m_min,m_max],[2e-10*0.1*m_min,2e-10*0.1*m_max],'-',\
+                        color='brown',lw=1.5,zorder=0,alpha=0.1)
+    plt.plot([m_min,m_max],[2e-10*10*m_min,2e-10*10*m_max],'-',\
+                        color='brown',lw=1.5,zorder=0,alpha=0.1)
 
     fs = 25
-    AxionPhoton.NeutronStars(ax,col=[0.0, 0.66, 0.42],fs=15,RescaleByMass=False,text_on=False)
+    AxionPhoton.NeutronStars(ax,col=[0.0, 0.66, 0.42],fs=15,\
+                            RescaleByMass=False,text_on=False)
     AxionPhoton.ADMX(ax,col='darkred',fs=fs,text_on=False)
     AxionPhoton.RBF_UF(ax,col='darkred',fs=fs-2,text_on=False)
     AxionPhoton.HAYSTAC(ax,col='darkred',text_on=False)
@@ -275,19 +287,27 @@ def AxionPlotSetup(CAST_text_on=True,Haloscopes_text_on=True,QCD_text_on=True,St
         plt.gcf().text(0.295,0.75,r'{\bf CAST}',color='w',fontsize=50)
 
     if StellarBounds_text_on:
-        plt.gcf().text(0.89,0.59,r'{\bf Stellar bounds}',color='k',fontsize=30,horizontalalignment='right')
-        plt.gcf().text(0.888,0.59,r'{\bf Stellar bounds}',color='w',fontsize=30,horizontalalignment='right')
+        plt.gcf().text(0.89,0.59,r'{\bf Stellar bounds}',color='k',\
+                            fontsize=30,horizontalalignment='right')
+        plt.gcf().text(0.888,0.59,r'{\bf Stellar bounds}',color='w',\
+                            fontsize=30,horizontalalignment='right')
 
     if Haloscopes_text_on:
-        plt.gcf().text(0.188,0.135,r'{\bf Haloscopes}',color='k',rotation=90,fontsize=32,rotation_mode='anchor',zorder=0)
-        plt.gcf().text(0.185,0.1351,r'{\bf Haloscopes}',color='w',rotation=90,fontsize=32,rotation_mode='anchor',zorder=0)
+        plt.gcf().text(0.188,0.135,r'{\bf Haloscopes}',color='k',\
+                        rotation=90,fontsize=32,rotation_mode='anchor',zorder=0)
+        plt.gcf().text(0.185,0.1351,r'{\bf Haloscopes}',color='w',\
+                        rotation=90,fontsize=32,rotation_mode='anchor',zorder=0)
 
     if QCD_text_on:
         cols = cm.get_cmap('YlOrBr')
-        plt.gcf().text(0.561,0.13,r'{\bf KSVZ}',rotation=63,fontsize=32,rotation_mode='anchor')
-        plt.gcf().text(0.611,0.13,r'{\bf DFSZ II}',rotation=63,fontsize=32,rotation_mode='anchor')
-        plt.gcf().text(0.56,0.13,r'{\bf KSVZ}',rotation=63,fontsize=32,rotation_mode='anchor',color=cols(0.9))
-        plt.gcf().text(0.61,0.13,r'{\bf DFSZ II}',rotation=63,fontsize=32,rotation_mode='anchor',color=cols(0.9))
+        plt.gcf().text(0.561,0.13,r'{\bf KSVZ}',rotation=63,\
+                                fontsize=32,rotation_mode='anchor')
+        plt.gcf().text(0.611,0.13,r'{\bf DFSZ II}',rotation=63,\
+                                fontsize=32,rotation_mode='anchor')
+        plt.gcf().text(0.56,0.13,r'{\bf KSVZ}',rotation=63,fontsize=32,\
+                                    rotation_mode='anchor',color=cols(0.9))
+        plt.gcf().text(0.61,0.13,r'{\bf DFSZ II}',rotation=63,fontsize=32,\
+                                    rotation_mode='anchor',color=cols(0.9))
 
 
     plt.title('space',color='w',fontsize=15)

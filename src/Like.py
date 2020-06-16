@@ -1,31 +1,24 @@
 #================================Like.py=======================================#
-# Written by C. O'Hare
+# Written by C. O'Hare 2020
 # Contains:
-# InterpExpectedEvents: convert tabulated data to data for arbitrary mass
-# lnPF: logarithm of poisson pdf
-# llhood2: -1*log-likelihood for params = (m_a,g)
-# llhood2_marg: profile likelihood for params = (m_a)
-# llhood2_marg0: value of llhood2_marg at m_a=0
-# llhood1: massless model likelihood params = (g)
-# ConstantObsNumberLine: constant event number lines
-# MassDiscoveryLimit_Simple: analytic median mass discovery limit
-# MassDiscoveryLimit_Minuit: numerical median mass discovery limit
-# MassEstimationDiscoveryLimit: numerical median mass estimation limit
+# 1. InterpExpectedEvents: converts tabulated data (from AxionFuncs.py)
+#    to data for arbitrary mass
+# 2. ConstantObsNumberLine: contour of constant N_exp
+# 3. Mass discovery limit (simple analytic formula)
+# 4. Bfield discovery limit (simple analytic formula)
+# 5. Background events
 #==============================================================================#
-
 
 from numpy import pi, sqrt, exp, zeros, size, shape, sinc, linspace, logspace
 from numpy import log10, floor, log, interp
 from numpy import append, flipud, argmin, ones, array, vstack
 from scipy.integrate import cumtrapz, quad
-from iminuit import minimize
+#from iminuit import minimize # <--- uncomment this to use minuit
+from scipy.optimize import minimize # <--- comment this to use minuit
 from numpy.random import poisson
-#from scipy.optimize import minimize
 from scipy.special import gammaln
 import emcee
 
-#==============================================================================#
-# Important functions:
 #==============================================================================#
 # that interpolates N_exp events at an arbitrary mass (m)
 # using the tabulated data stored in R1_tab, then rescales by g
@@ -33,7 +26,8 @@ def InterpExpectedEvents(g,m,m_vals,R1_tab):
     nm = size(m_vals)
     m1 = m_vals[0]
     m2 = m_vals[-1]
-    i1 = int(floor((log10(m)-log10(m_vals[0]))*(nm-1.0)/(log10(m_vals[-1])-log10(m_vals[0]))+1.0))-1
+    i1 = int(floor((log10(m)-log10(m_vals[0]))*(nm-1.0)/\
+                    (log10(m_vals[-1])-log10(m_vals[0]))+1.0))-1
     i2 = i1+1
     if (i1<0) or (i2<0):
         i1 = 0
@@ -43,41 +37,6 @@ def InterpExpectedEvents(g,m,m_vals,R1_tab):
     return N_exp
 #==============================================================================#
 
-
-#==============================================================================#
-# Simple analytic calculation of mass discovery limit for (m,g) likelihood
-def MassDiscoveryLimit_Simple(m_vals,R1_tab,R0,m_DL_vals):
-        nm = size(m_vals)
-        n_DL = size(m_DL_vals)
-        DL = zeros(shape=n_DL)
-        for im in range(0,n_DL):
-            m0 = m_DL_vals[im]
-            i0 = int(floor((log10(m0)-log10(m_vals[0]))*(nm-1.0)/(log10(m_vals[-1])-log10(m_vals[0]))+1.0))-1
-            i0 = max(i0,0)
-            N = R1_tab[:,i0]
-            N0 = R0
-            D = sum(R1_tab[:,i0])/sum(R0)
-            DL[im] = 1e-10*(9.0/sum(2*N*log(N/(D*N0))))**0.25
-        return DL
-#==============================================================================#
-
-
-#==============================================================================#
-# Simple analytic calculation of mass discovery limit for (m,g) likelihood
-def BfieldDiscoveryLimit_Simple(m_vals,m_DL_vals,R1_tab,R0_tab):
-        nm = size(m_vals)
-        n_DL = size(m_DL_vals)
-        DL = zeros(shape=n_DL)
-        for im in range(0,n_DL):
-            m0 = m_DL_vals[im]
-            i0 = int(floor((log10(m0)-log10(m_vals[0]))*(nm-1.0)/(log10(m_vals[-1])-log10(m_vals[0]))+1.0))-1
-            i0 = max(i0,0)
-            N = R1_tab[:,i0] # Non zero B-field
-            N0 = R0_tab[:,i0] # zero B-field
-            D = sum(N)/sum(N0)
-            DL[im] = 1e-10*(9.0/sum(2*N*log(N/(D*N0))))**0.25
-        return DL
-#==============================================================================#
 
 
 #==============================================================================#
@@ -93,40 +52,87 @@ def ConstantObsNumberLine(N_ob,mi,m_vals,R1_tab):
 
 
 
-def BinnedBackgroundEvents(Ei,E_bins,background_level=1.0e-8,A_detector=8*0.15,Exposure=3.0):
+#==============================================================================#
+# Simple analytic calculation of mass discovery limit (see Dafni et al. 2020)
+def MassDiscoveryLimit_Simple(m_vals,R1_tab,R0,m_DL_vals):
+        nm = size(m_vals)
+        n_DL = size(m_DL_vals)
+        DL = zeros(shape=n_DL)
+        for im in range(0,n_DL):
+            m0 = m_DL_vals[im]
+            i0 = int(floor((log10(m0)-log10(m_vals[0]))*(nm-1.0)\
+                        /(log10(m_vals[-1])-log10(m_vals[0]))+1.0))-1
+            i0 = max(i0,0)
+            N = R1_tab[:,i0]
+            N0 = R0
+            D = sum(R1_tab[:,i0])/sum(R0)
+            DL[im] = 1e-10*(9.0/sum(2*N*log(N/(D*N0))))**0.25
+        return DL
+#==============================================================================#
+
+
+
+
+#==============================================================================#
+# Simple analytic calculation of mass discovery limit
+def BfieldDiscoveryLimit_Simple(m_vals,m_DL_vals,R1_tab,R0_tab):
+        nm = size(m_vals)
+        n_DL = size(m_DL_vals)
+        DL = zeros(shape=n_DL)
+        for im in range(0,n_DL):
+            m0 = m_DL_vals[im]
+            i0 = int(floor((log10(m0)-log10(m_vals[0]))*(nm-1.0)/\
+                        (log10(m_vals[-1])-log10(m_vals[0]))+1.0))-1
+            i0 = max(i0,0)
+            N = R1_tab[:,i0] # Non zero B-field
+            N0 = R0_tab[:,i0] # zero B-field
+            D = sum(N)/sum(N0)
+            DL[im] = 1e-10*(9.0/sum(2*N*log(N/(D*N0))))**0.25
+        return DL
+#==============================================================================#
+
+
+
+#==============================================================================#
+def BinnedBackgroundEvents(Ei,E_bins,background_level=1.0e-8,\
+                            A_detector=8*0.15,Exposure=3.0):
     nE_bins = shape(E_bins)[0]
     nfine = int(shape(Ei)[0]/nE_bins)
-    dN_B = A_detector*background_level*Exposure*3600*24*365*ones(shape=nE_bins*nfine)
+    dN_B = A_detector*background_level*Exposure*3600*24*365*\
+                        ones(shape=nE_bins*nfine)
     Background = zeros(shape=nE_bins)
     for i in range(0,nE_bins):
         Ebin = Ei[i*nfine:(i+1)*nfine]
         dNbin = dN_B[i*nfine:(i+1)*nfine]
         Background[i] = sum(0.5*(Ebin[1:]-Ebin[0:-1])*(dNbin[1:]+dNbin[0:-1]))
     return Background
+#==============================================================================#
 
 
 
 
 
 
-
-
-
-
-
-
+#==============================================================================#
+# Useful likelihoods
 # Log of poisson pdf
 def lnPF(Nob,Nex):
     return sum(Nob*log(Nex) - Nex)# - gammaln(Nob+1.0)) #factorial removed for speed
-
 def lnGF(x,mu,sig): # SUM OF LOG(GAUSSIAN PDF)
     L = (-1.0*log(sig)-0.5*log(2.0*pi)-(x-mu)**2.0/(2.0*sig**2.0))
     return L
-
 #==============================================================================#
+
+
+
 
 #==============================================================================#
 # Simple 2D profile likelihood tests
+# g = axion photon coupling
+# Signal_10 = Signal table (from AxionFuncs.py) for gag=1e-10
+# Background = Background table
+
+# Full monte carlo for N_expts toy experiments:
 def ProfileLikelihoodTest_2D_MonteCarlo(g,Signal_10,Background,n_expts=100):
     mu_true10 = sum(Signal_10)
     mu_true = mu_true10*(g/1e-10)**4.0
@@ -146,7 +152,7 @@ def ProfileLikelihoodTest_2D_MonteCarlo(g,Signal_10,Background,n_expts=100):
     T1[T1<0.0] = 0.0
     return T1
 
-
+# Asimov approximation:
 def ProfileLikelihoodTest_2D_Asimov(g,Signal_10,Background):
     mu_true10 = sum(Signal_10)
     mu_true = mu_true10*(g/1e-10)**4.0
@@ -166,7 +172,19 @@ def ProfileLikelihoodTest_2D_Asimov(g,Signal_10,Background):
 
 
 
-def ProfileLikelihood_Sensitivity(m_DL_vals,m_vals,Signal_10,Background,Nmin=0.0,Nmax=50.0,ng=50):
+
+
+
+#==============================================================================#
+# Sensitiviy calculations based on profile likelihood ratio test
+# m_vals = values of mass used to make the table Signal_10
+# m_DL = values of mass to evaluate the discovery limit at
+# ng = values of g to scan over for each mass
+# Nmin/max = min/max values of N_exp used to set the range of g to search over
+
+# Asimov approximation
+def ProfileLikelihood_Sensitivity(m_DL_vals,m_vals,Signal_10,Background,\
+                                    Nmin=0.0,Nmax=50.0,ng=50):
     n_DL = shape(m_DL_vals)[0]
     DL = zeros(shape=n_DL)
     DL_1sig_upper = zeros(shape=n_DL)
@@ -179,18 +197,22 @@ def ProfileLikelihood_Sensitivity(m_DL_vals,m_vals,Signal_10,Background,Nmin=0.0
         gvals = 1e-10*(linspace(Nmin,Nmax,ng)/N10)**(1.0/4.0)
         T1_asimov = zeros(shape=ng)
         for j in range(0,ng):
-            T1_asimov[j] = sqrt(ProfileLikelihoodTest_2D_Asimov(gvals[j],Signal_10_i,Background))
+            T1_asimov[j] = sqrt(ProfileLikelihoodTest_2D_Asimov(gvals[j],\
+                                    Signal_10_i,Background))
 
             if (T1_asimov[j]-1.8)>1.64:
                 break
-        DL_1sig_upper[i] = interp(1.64,T1_asimov[1:j]+1,gvals[1:j])
-        DL_1sig_lower[i] = interp(1.64,T1_asimov[1:j]-1,gvals[1:j])
-        DL_2sig_upper[i] = interp(1.64,T1_asimov[1:j]+1.8,gvals[1:j])
-        DL_2sig_lower[i] = interp(1.64,T1_asimov[1:j]-1.8,gvals[1:j])
+        DL_1sig_upper[i] = interp(1.64,T1_asimov[1:j]+1,gvals[1:j]) # 68% upper
+        DL_1sig_lower[i] = interp(1.64,T1_asimov[1:j]-1,gvals[1:j]) # 68% lower
+        DL_2sig_upper[i] = interp(1.64,T1_asimov[1:j]+1.8,gvals[1:j]) #95% upper
+        DL_2sig_lower[i] = interp(1.64,T1_asimov[1:j]-1.8,gvals[1:j]) #96% lower
         DL[i] = interp(1.64,T1_asimov[1:j],gvals[1:j])
     return vstack((DL,DL_1sig_lower,DL_1sig_upper,DL_2sig_lower,DL_2sig_upper))
 
-def ProfileLikelihood_Sensitivity_MonteCarlo(m_DL_vals,m_vals,Signal_10,Background,n_expts=100,Nmin=3.0,Nmax=50.0,ng=20):
+# Full Monte Carlo
+def ProfileLikelihood_Sensitivity_MonteCarlo(m_DL_vals,m_vals,Signal_10,\
+                                Background,n_expts=100,Nmin=3.0,Nmax=50.0,ng=20,
+                                verbose=True):
     n_DL = shape(m_DL_vals)[0]
     DL = zeros(shape=n_DL)
     for i in range(0,n_DL):
@@ -199,21 +221,27 @@ def ProfileLikelihood_Sensitivity_MonteCarlo(m_DL_vals,m_vals,Signal_10,Backgrou
         gvals = 1e-10*(linspace(Nmin,Nmax,ng)/N10)**(1.0/4.0)
         T1 = zeros(shape=ng)
         for j in range(0,ng):
-            T = ProfileLikelihoodTest_2D_MonteCarlo(gvals[j],Signal_10_i,Background,n_expts=n_expts)
+            T = ProfileLikelihoodTest_2D_MonteCarlo(gvals[j],\
+                            Signal_10_i,Background,n_expts=n_expts)
             T1[j] = sqrt(sort(T)[int(0.50*n_expts)])
-            T1_asimov = sqrt(ProfileLikelihoodTest_2D_Asimov(gvals[j],Signal_10_i,Background))
+            T1_asimov = sqrt(ProfileLikelihoodTest_2D_Asimov(gvals[j],\
+                                        Signal_10_i,Background))
 
             #print(j,T1[j],T1_asimov)
             if (T1[j])>1.64:
                 break
         DL[i] = interp(1.64,T1[1:j+1],gvals[1:j+1])
-        print(i,DL[i])
+        if verbose:
+            print(i,DL[i])
     return DL
+#==============================================================================#
 
 
 
 
 
+#==============================================================================#
+# Similar to above but for the (g,m,B) likelihood function:
 def ProfileLikelihoodTest_3D_Asimov(g,Signal_10,Signal_10_B,Background):
     mu_true10 = sum(Signal_10)
     mu_true10_1 = sum(Signal_10_B)
@@ -236,8 +264,10 @@ def ProfileLikelihoodTest_3D_Asimov(g,Signal_10,Signal_10_B,Background):
     T1_asimov = -2*(logL1(res1.x)-logL0(res0.x))
     return T1_asimov
 
-
-def ProfileLikelihood_BfieldSensitivity(m_DL_vals,m_vals,Signal_10,Signal_10_B,Background,Nmin=0.0,Nmax=10.0,ng=50):
+# Signal_10 -> B=0 photon number table for gag=1e-10
+# Signal_10_B -> B!=0 photon number table for gag=1e-10
+def ProfileLikelihood_BfieldSensitivity(m_DL_vals,m_vals,Signal_10,Signal_10_B,\
+                        Background,Nmin=0.0,Nmax=10.0,ng=50):
     n_DL = shape(m_DL_vals)[0]
     DL = zeros(shape=n_DL)
     DL_1sig_upper = zeros(shape=n_DL)
@@ -252,20 +282,52 @@ def ProfileLikelihood_BfieldSensitivity(m_DL_vals,m_vals,Signal_10,Signal_10_B,B
         gvals = 1e-10*(linspace(Nmin,Nmax,ng)/N10)**(1.0/4.0)
         T1_asimov = zeros(shape=ng)
         for j in range(0,ng):
-            T1_asimov[j] = sqrt(ProfileLikelihoodTest_3D_Asimov(gvals[j],Signal_10_i,Signal_10_i_1,Background))
+            T1_asimov[j] = sqrt(ProfileLikelihoodTest_3D_Asimov(gvals[j],\
+                                    Signal_10_i,Signal_10_i_1,Background))
 
             if (T1_asimov[j]-1.8)>1.64:
                 break
-        DL_1sig_upper[i] = interp(1.64,T1_asimov[1:j]+1,gvals[1:j])
-        DL_1sig_lower[i] = interp(1.64,T1_asimov[1:j]-1,gvals[1:j])
-        DL_2sig_upper[i] = interp(1.64,T1_asimov[1:j]+1.8,gvals[1:j])
-        DL_2sig_lower[i] = interp(1.64,T1_asimov[1:j]-1.8,gvals[1:j])
+        DL_1sig_upper[i] = interp(1.64,T1_asimov[1:j]+1,gvals[1:j]) # 68%
+        DL_1sig_lower[i] = interp(1.64,T1_asimov[1:j]-1,gvals[1:j]) # 68%
+        DL_2sig_upper[i] = interp(1.64,T1_asimov[1:j]+1.8,gvals[1:j]) # 95%
+        DL_2sig_lower[i] = interp(1.64,T1_asimov[1:j]-1.8,gvals[1:j]) # 95%
         DL[i] = interp(1.64,T1_asimov[1:j],gvals[1:j])
     return vstack((DL,DL_1sig_lower,DL_1sig_upper,DL_2sig_lower,DL_2sig_upper))
+#==============================================================================#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #==============================================================================#
-# (mass,coupling) Likelihoods and discovery limit:
+#==============================================================================#
+#==============================================================================#
+#==============================================================================#
+#==============================================================================#
+# OLD CODE:
+#==============================================================================#
+#==============================================================================#
+#==============================================================================#
+#==============================================================================#
+
+
+
+#==============================================================================#
+# Old likelihood analysis:
 
 # 2D likelihood for (g,m)
 def llhood2(X,N_obs,m_vals,R1_tab):
@@ -302,7 +364,8 @@ def MassDiscoveryLimit_Simple(m_vals,R1_tab,R0,m_DL_vals):
         DL = zeros(shape=n_DL)
         for im in range(0,n_DL):
             m0 = m_DL_vals[im]
-            i0 = int(floor((log10(m0)-log10(m_vals[0]))*(nm-1.0)/(log10(m_vals[-1])-log10(m_vals[0]))+1.0))-1
+            i0 = int(floor((log10(m0)-log10(m_vals[0]))*(nm-1.0)\
+                            /(log10(m_vals[-1])-log10(m_vals[0]))+1.0))-1
             N = R1_tab[:,i0]
             N0 = R0
             D = sum(R1_tab[:,i0])/sum(R0)
@@ -312,12 +375,6 @@ def MassDiscoveryLimit_Simple(m_vals,R1_tab,R0,m_DL_vals):
 
 
 
-
-
-
-
-
-#==============================================================================#
 # Expanded Likelihoods and Discovery limit using Minuit:
 
 # 3D likelihood for (g,m,dPhi)
@@ -437,19 +494,6 @@ def MassEstimationDiscoveryLimit(err,m_vals,R0,R1_tab,m_DL_vals,sigmas=2,gmin_va
 
 
 
-
-
-
-
-
-#==============================================================================#
-#==============================================================================#
-#==============================================================================#
-#==============================================================================#
-#==============================================================================#
-
-
-# OLD CODE:
 
 #==============================================================================#
 # Given an input mass and coupling (m0,g0), calculates the confidence interval
