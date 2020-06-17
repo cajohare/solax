@@ -10,7 +10,7 @@
 #==============================================================================#
 
 from numpy import pi, sqrt, exp, zeros, size, shape, sinc, linspace, logspace
-from numpy import log10, floor, log, interp
+from numpy import log10, floor, log, interp, sort
 from numpy import append, flipud, argmin, ones, array, vstack
 from scipy.integrate import cumtrapz, quad
 #from iminuit import minimize # <--- uncomment this to use minuit
