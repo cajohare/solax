@@ -20,7 +20,6 @@ from scipy.spatial import ConvexHull
 from scipy.stats import zscore,chi2,multivariate_normal
 from scipy.special import erfinv
 from scipy.stats import gaussian_kde
-import cartopy.crs as ccrs
 import matplotlib.ticker as mticker
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from scipy.stats import norm

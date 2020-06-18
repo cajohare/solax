@@ -17,7 +17,6 @@ from scipy.integrate import cumtrapz, quad
 from scipy.optimize import minimize # <--- comment this to use minuit
 from numpy.random import poisson
 from scipy.special import gammaln
-import emcee
 
 #==============================================================================#
 # that interpolates N_exp events at an arbitrary mass (m)
