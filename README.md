@@ -14,6 +14,7 @@ If you need any assistance or have any questions contact me at ciaran.aj.ohare@g
 * [`iminuit`](https://iminuit.readthedocs.io/en/latest/)
 * [`astropy`](https://www.astropy.org/)
 * [`cmocean`](https://matplotlib.org/cmocean/)
+* [`numba`](http://numba.pydata.org/)
 
 # Contents
 * `data/` - Contains various data files, fluxes, solar models and axion limit data
