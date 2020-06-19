@@ -1,4 +1,3 @@
-[![DOI](https://zenodo.org/badge/156694427.svg)](https://zenodo.org/badge/latestdoi/156694427)
 [![arXiv](https://img.shields.io/badge/arXiv-2006.10415-B31B1B.svg)](https://arxiv.org/abs/2006.10415)
 [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)
 
