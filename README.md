@@ -1,10 +1,10 @@
 [![DOI](https://zenodo.org/badge/156694427.svg)](https://zenodo.org/badge/latestdoi/156694427)
-[![arXiv](https://img.shields.io/badge/arXiv-1909.04684-B31B1B.svg)](https://arxiv.org/abs/1909.04684)
+[![arXiv](https://img.shields.io/badge/arXiv-1909.04684-B31B1B.svg)](https://arxiv.org/abs/2006.10415)
 [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)
 
 
 # solax
-Python-3 Code to reproduce the results from our paper arXiv:[2006.XXXXX] "Axion helioscopes as solar magnetometers"
+Python-3 Code to reproduce the results from our paper arXiv:[2006.10415] "Axion helioscopes as solar magnetometers"
 
 If all you need is the data for the longitudinal plasmon flux for our benchmark seismic solar magnetic field model then [click here](https://github.com/cajohare/solax/raw/master/data/solar/LPlasmonFlux_SeismicB.txt). If you want the refined Primakoff flux data then [click here](https://github.com/cajohare/solax/raw/master/data/solar/PrimakoffFlux_PlasmonCorrected.txt)
 
