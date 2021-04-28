@@ -35,9 +35,9 @@ cm_2_keV = 1.0/(1e6*1.9732e-14) # convert cm to keV^-1
 fsc = 1.0/137.036 # fine structure constant
 amu_grams = 1.66054e-24 # amu in grams
 AU_cm = 100*1.495978707e11 # cm
-keV_2_s = 1000/6.5821e-16
-cm_2_keV = 1.0/(1e6*1.9732e-14)
-Rsol_keV = 696340*1000*100*cm_2_keV
+keV_2_s = 1000/6.5821e-16 # keV to s^-1
+cm_2_keV = 1.0/(1e6*1.9732e-14) # keV to cm^-1
+Rsol_keV = 696340*1000*100*cm_2_keV # solar radius to keV^-1
 
 Gauss_2_keV = 1.95e-20*(1e6)**2.0
 Tesla_2_keV = 1e4*Gauss_2_keV
