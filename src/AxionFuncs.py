@@ -9,7 +9,7 @@
 
 
 from numpy import pi, sqrt, exp, zeros, size, shape,argmin,cos,gradient,ones
-from numpy import sinc, linspace, trapz, loadtxt, interp, vstack
+from numpy import sinc, linspace, trapz, loadtxt, interp, vstack,column_stack,savetxt
 from scipy.integrate import cumtrapz, quad
 from Params import *
 from numba import jit
